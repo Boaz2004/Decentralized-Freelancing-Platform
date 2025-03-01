@@ -1,0 +1,21 @@
+{
+  "dependencies": {
+    "@metamask/detect-provider": "^2.0.0",
+    "@thirdweb-dev/auth": "^4.1.97",
+    "ethers": "^5.8.0",
+    "react": "^18.3.1",
+    "thirdweb": "^5.89.1",
+    "web3": "^4.16.0"
+  },
+  "name": "fiverr-clone",
+  "version": "1.0.0",
+  "description": "<h1 align=\"center\">Fiverr clone</h1>",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -1,4 +1,4 @@
-<h1 align="center">Fiverr Clone</h1>
+<h1 align="center">Fiverr clone</h1>
 
 <h3 align="center">A setout to clone one of the largest outsourcing platforms using the toolset from the MERN stack.</h3>
 

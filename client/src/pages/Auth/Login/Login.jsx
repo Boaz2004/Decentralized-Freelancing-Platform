@@ -1,82 +1,57 @@
-import toast from 'react-hot-toast';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { axiosFetch } from '../../../utils';
-import { useRecoilState } from 'recoil';
-import { userState } from '../../../atoms';
-import './Login.scss';
-
-const initialState = {
-  username: '',
-  password: ''
-}
+import React, { useEffect, useState } from 'react';
+import detectEthereumProvider from '@metamask/detect-provider';
+import './Login.css'; // Import the CSS file
 
 const Login = () => {
-  const [formInput, setFormInput] = useState(initialState);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [user, setUser] = useRecoilState(userState);
-  const navigate = useNavigate();
+  const [account, setAccount] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
+    async function checkMetaMask() {
+      const provider = await detectEthereumProvider();
 
-  const handleFormInput = (event) => {
-    const { value, name } = event.target;
-    setFormInput({
-      ...formInput,
-      [name]: value
-    });
-  }
-
-  const handleFormSubmit = async (event) => {
-    event.preventDefault();
-
-    for(let key in formInput) {
-      if(formInput[key] === '') {
-        toast.error('Please fill all input fields: ' + key);
-        return;
+      if (provider) {
+        console.log('MetaMask is installed!');
+        setIsConnected(true);
+      } else {
+        console.log('Please install MetaMask!');
+        setIsConnected(false);
       }
     }
 
-    setLoading(true);
+    checkMetaMask();
+  }, []);
+
+  const handleLogin = async () => {
     try {
-      const { data } = await axiosFetch.post('/auth/login', formInput);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      setUser(data.user);
-      toast.success("Welcome back!", {
-        duration: 3000,
-        icon: "😃"
-      });
-      navigate('/');
+      const provider = await detectEthereumProvider();
+
+      if (provider) {
+        const accounts = await provider.request({ method: 'eth_requestAccounts' });
+        setAccount(accounts[0]);
+        console.log('Connected account:', accounts[0]);
+      } else {
+        alert('MetaMask is not available. Please install MetaMask!');
+      }
+    } catch (error) {
+      console.error('Error connecting to MetaMask:', error);
     }
-    catch ({ response: { data } }) {
-      setError(data.message);
-      toast.error(data.message, {
-        duration: 3000,
-      });
-    }
-    finally {
-      setLoading(false);
-      setError(null);
-    }
-  }
+  };
 
   return (
-    <div className='login'>
-      <form action="" onSubmit={handleFormSubmit}>
-        <h1>Sign in</h1>
-        <label htmlFor="">Username</label>
-        <input name='username' placeholder='johndoe' onChange={handleFormInput} />
-
-        <label htmlFor="">Password</label>
-        <input name='password' type='password' placeholder='password' onChange={handleFormInput} />
-        <button disabled={loading} type='submit'>{ loading ? 'Loading' : 'Login' }</button>
-        <span>{error && error}</span>
-      </form>
+    <div className="login-container">
+      <h1 className="login-title">Web3 Login</h1>
+      {!isConnected ? (
+        <p className="install-message">Please install MetaMask to use this app.</p>
+      ) : account ? (
+        <p className="account-display">Connected with account: {account}</p>
+      ) : (
+        <button className="metamask-button" onClick={handleLogin}>
+          CLick to connect MetaMask
+        </button>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;
